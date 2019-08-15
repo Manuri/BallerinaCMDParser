@@ -1,0 +1,10 @@
+[2019-08-15 17:01:50,075] ERROR {org.ballerinalang.jvm.scheduling.Scheduler} - Strand died 
+error: 	error occurred when pulling the module 
+	at ballerina:createError(module_pull.bal:56)
+	   ballerina:pullPackage(module_pull.bal:146)
+	   ballerina:main(module_pull.bal:101) 
+[2019-08-15 17:01:51,127] ERROR {org.ballerinalang.jvm.scheduling.Scheduler} - Strand died 
+error: 	error occurred when pulling the module 
+	at ballerina:createError(module_pull.bal:56)
+	   ballerina:pullPackage(module_pull.bal:146)
+	   ballerina:main(module_pull.bal:101) 

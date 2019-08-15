@@ -1,0 +1,5 @@
+[project]
+org-name= "manurip"
+version= "0.1.0"
+
+[dependencies]
