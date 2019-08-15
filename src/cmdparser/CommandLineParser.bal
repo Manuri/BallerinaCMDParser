@@ -1,3 +1,8 @@
+import ballerina/log;
+
+const string FLAG_PREFIX = "++";
+const string FLAG_KEY_VAL_SEPERATOR = "=";
+
 public type CommandLineParser object {
     map<Command> commands = {};
 
@@ -8,6 +13,13 @@ public type CommandLineParser object {
     }
 
     public function parse(string[] args) {
+        error? e = self.parseInternal(args);
+        if (!(e is ())) {
+          log:printError(e.reason());
+        }
+    }
+
+    private function parseInternal(string[] args) returns error? {
 		int argsLength = args.length();
 
         int argIndex = 0;
@@ -15,33 +27,38 @@ public type CommandLineParser object {
         Command? currentCommand = self.commands.get(commandName);
         if (currentCommand is ()) {
             error e = error("There aren't any commands");
-            panic e;
+            return e;
         } else {
             argIndex = argIndex + 1;
-            while(argIndex < argsLength && !args[argIndex].startsWith("++")) {
+            while(argIndex < argsLength) {
                commandName = args[argIndex];
+               if (commandName.startsWith(FLAG_PREFIX)) {
+                   break;
+               }
                map<Command>? commandsMap = currentCommand?.allowedSubCommands;
                if (commandsMap is map<Command>) {
-                currentCommand = currentCommand?.allowedSubCommands[commandName];
-                argIndex = argIndex + 1;
+                 currentCommand = currentCommand?.allowedSubCommands[commandName];
+                 argIndex = argIndex + 1;
                } else {
-                 error e = error("Invalid sub command: " + commandName);
-                 panic e;
+                 error e = error("Invalid token: " + commandName);
+                 return e;
                }
             }
         }
 
         if (currentCommand is ()) {
             error e = error("There aren't any commands");
-            panic e;
+            return e;
         } else {
             commandName = args[argIndex];
             map<string> flags = {};
-            boolean subCommandPresent = true;
-            while (argIndex < argsLength && args[argIndex].startsWith("++")) {
-                subCommandPresent = false;
+            while (argIndex < argsLength) {
                 string flag = args[argIndex];
-                int? equalIndex = flag.indexOf("=");
+                if (!flag.startsWith(FLAG_PREFIX)) {
+                   error e = error("Invalid token: " + flag);
+                   return e;
+                }
+                int? equalIndex = flag.indexOf(FLAG_KEY_VAL_SEPERATOR);
                 if (equalIndex is int) {
                     string key = flag.substring(2, equalIndex - 1);
                     string val = flag.substring(equalIndex + 1, flag.length());
